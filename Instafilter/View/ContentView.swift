@@ -39,21 +39,19 @@ struct ContentView: View {
                 
                 Spacer()
                 
-                HStack {
-                    Text("Intensity")
-                    Slider(value: $filterIntensity)
-                        .onChange(of: filterIntensity, applyProcessing)
+                if let processedImage {
                     
-                }
-                .padding(.vertical)
-                
-                HStack {
-                    Button("Change Filter", action: changeFilter)
+                    HStack {
+                        Text("Intensity")
+                        Slider(value: $filterIntensity)
+                            .onChange(of: filterIntensity, applyProcessing)
+                        
+                    }
+                    .padding(.vertical)
                     
-                    
-                    Spacer()
-                    
-                    if let processedImage {
+                    HStack {
+                        Button("Change Filter", action: changeFilter)
+                        Spacer()
                         ShareLink(item: processedImage, preview: SharePreview("Instafilter image", image: processedImage))
                     }
                 }
@@ -69,11 +67,8 @@ struct ContentView: View {
                 Button("Unsharp Mask") { setFilter(CIFilter.unsharpMask()) }
                 Button("Vignette") { setFilter(CIFilter.vignette()) }
                 Button("Cancel", role: .cancel) { }
-
             }
-
         }
-        
     }
     
     func loadImage() {
@@ -84,7 +79,6 @@ struct ContentView: View {
             let beginImage = CIImage(image: inputImage)
             currentFilter.setValue(beginImage, forKey: kCIInputImageKey)
             applyProcessing()
-            
         }
     }
     
@@ -100,16 +94,13 @@ struct ContentView: View {
         if inputKeys.contains(kCIInputScaleKey) {
             currentFilter.setValue(filterIntensity * 10, forKey: kCIInputScaleKey)
         }
-
-        
+   
         guard let outputImage = currentFilter.outputImage else { return }
         guard let cgImage = context.createCGImage(outputImage, from: outputImage.extent) else { return }
         
         let uiImage = UIImage(cgImage: cgImage)
         processedImage = Image(uiImage: uiImage)
     }
-    
-    
     
     func changeFilter() {
         showingFilters = true
@@ -124,11 +115,7 @@ struct ContentView: View {
         if filterCount >= 20 {
             requestReview()
         }
-        
     }
-
-    
-    
 }
 
 
